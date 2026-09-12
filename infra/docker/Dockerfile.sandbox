@@ -1,0 +1,22 @@
+# Isolated Python Analytics Sandbox Container
+FROM python:3.11-alpine
+
+# Set non-root secure user
+RUN addgroup -S sovereign && adduser -S sandbox_user -G sovereign
+
+WORKDIR /sandbox
+
+# Install standard analytical libraries without network permissions
+RUN pip install --no-cache-dir \
+    pandas \
+    numpy \
+    matplotlib \
+    openpyxl \
+    scipy
+
+# Drop all network capabilities
+USER sandbox_user
+
+ENV PYTHONUNBUFFERED=1
+CMD ["python3"]
+

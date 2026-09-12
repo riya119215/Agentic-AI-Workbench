@@ -1,0 +1,44 @@
+# Defense-Grade Air-Gap NetworkPolicy
+# ENFORCES MATHEMATICAL ZERO-EGRESS TO PUBLIC WAN (0.0.0.0/0)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sovereign-zero-egress-lockdown
+  namespace: sovereign-ai
+spec:
+  podSelector:
+    matchLabels:
+      security-zone: airgap-restricted
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow internal UI and Intra-Cluster Traffic ONLY
+  - from:
+    - podSelector:
+        matchLabels:
+          app: sovereign-frontend
+    ports:
+    - protocol: TCP
+      port: 8000
+  egress:
+  # Allow local namespace DNS and local Ollama GPU Inference pod ONLY
+  - to:
+    - podSelector:
+        matchLabels:
+          app: ollama-gpu-engine
+    ports:
+    - protocol: TCP
+      port: 11434
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+  # ZERO OUTBOUND WAN RULES: Any other IP (including all public internet) is dropped at kernel level.
+

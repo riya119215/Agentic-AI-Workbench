@@ -1,0 +1,21 @@
+﻿FIELD INSPECTION & TELEMETRY AUDIT REPORT
+REPORT REF: QA/INSP/TURB-07/2026-SEP-11
+LOCATION: SOVEREIGN ENERGY GENERATION COMPLEX - UNIT 7
+INSPECTOR: ER. A. K. MISHRA (SR. FIELD INSPECTOR)
+DATE OF INSPECTION: 11-SEP-2026
+
+EQUIPMENT IDENTIFICATION:
+- Unit: High-Pressure Steam Turbine Rotor Assembly #07
+- Commissioned Date: 2019
+- Operating Hours: 38,420 hrs
+
+OBSERVED MEASUREMENTS & SENSOR AUDIT:
+1. Turbine Bearing Drive-End Vibration (Peak RMS): 4.85 mm/s
+   [Visual Inspection: Noticeable acoustic resonance and micro-cavitation observed at shaft collar]
+2. Journal Bearing Babbitt Temperature: 94.2 deg C
+3. Lubrication Oil Pressure: 1.85 Bar (Acceptable range 1.8 - 2.2 Bar)
+4. Lube Oil Contamination: Particle count NAS Class 8 (Slight metallic debris noted)
+
+FIELD REMARKS & CONCLUSION:
+Rotor vibration (4.85 mm/s) and bearing temp (94.2 deg C) severely exceed normal operating envelopes. 
+Rotor balance degradation suspected. Forwarded to Quality Assurance Wing for immediate SOP verification and preparation of an official Administrative Approval Note for overhaul sanction.

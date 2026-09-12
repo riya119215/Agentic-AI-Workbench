@@ -1,0 +1,25 @@
+STANDARD OPERATING PROCEDURE (SOP)
+DOCUMENT NO: SOP-TURB-IND-2026-V4
+SECURITY CLASSIFICATION: RESTRICTED / OFFICIAL USE ONLY
+ISSUING AUTHORITY: DIRECTORATE OF HEAVY INDUSTRIAL TURBOMACHINERY & QUALITY STANDARDS
+
+1. SCOPE AND APPLICABILITY
+This document establishes mandatory operational limits, parametric tolerance envelopes, and inspection protocols for all Heavy Steam & Gas Turbine Power Generation Sets (Units 1 through 12).
+
+2. CRITICAL PARAMETRIC TOLERANCE LIMITS
+2.1 Bearing Vibration Envelopes (ISO 10816-3 Standard Alignment):
+- Nominal/Safe Operational Zone: <= 2.80 mm/s RMS
+- Advisory Warning Zone: 2.81 mm/s to 3.50 mm/s RMS (Continuous monitoring required)
+- Critical Breach / Emergency Rejection Limit: > 3.50 mm/s RMS (Mandatory immediate rotor de-energization and overhaul)
+
+2.2 Journal Bearing Temperature Tolerances:
+- Nominal Range: 55.0 deg C to 75.0 deg C
+- Upper Advisory Limit: 75.1 deg C to 85.0 deg C
+- Critical Thermal Trip Limit: > 90.0 deg C (Thermal degradation risk to white metal Babbitt liner)
+
+3. REGULATORY ACTION PROTOCOL
+Whenever any field inspection report detects parameters exceeding the Critical Breach Thresholds (>3.50 mm/s vibration or >90.0 deg C temp):
+- The Inspecting Officer must halt commercial operation within 4 hours.
+- Issue Form QA-88: Official Note Sheet / Approval Memorandum for Emergency Bearing Overhaul and Sanction of Replacement Spares.
+- The note must cite SOP-TURB-IND-2026-V4 Section 2.1 & Section 2.2 explicitly.
+

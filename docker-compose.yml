@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Sovereign Inference Engine (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sovereign_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+    # In full air-gap mode, network isolation can be set to internal:
+    # networks:
+    #   - sovereign_net
+
+  # Sovereign AI Workbench API & Agent
+  workbench-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sovereign_workbench_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      - ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_models:

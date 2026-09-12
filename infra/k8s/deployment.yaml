@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sovereign-workbench-backend
+  namespace: sovereign-ai
+  labels:
+    app: sovereign-backend
+    tier: core-engine
+    security-zone: airgap-restricted
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sovereign-backend
+  template:
+    metadata:
+      labels:
+        app: sovereign-backend
+        security-zone: airgap-restricted
+    spec:
+      containers:
+      - name: backend
+        image: sovereign-ai/backend:2.0.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "4000m"
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OLLAMA_BASE_URL
+          value: "http://ollama-service:11434"
+        - name: REASONING_MODEL
+          value: "qwen2.5:7b"
+        - name: CODING_MODEL
+          value: "qwen2.5-coder:7b"
+        - name: VISION_MODEL
+          value: "qwen2-vl:7b"
+        - name: EMBEDDING_MODEL
+          value: "bge-m3:latest"
+        volumeMounts:
+        - name: audit-storage
+          mountPath: /app/data/audit_logs
+        - name: vector-storage
+          mountPath: /app/data/chroma_db
+      volumes:
+      - name: audit-storage
+        persistentVolumeClaim:
+          claimName: sovereign-audit-pvc
+      - name: vector-storage
+        persistentVolumeClaim:
+          claimName: sovereign-vector-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: sovereign-ai
+spec:
+  selector:
+    app: sovereign-backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+
