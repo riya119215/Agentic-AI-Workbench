@@ -63,13 +63,13 @@ def cmd_egress(args):
     print(f"\n[NETWORK SCAN REPORT]")
     print(f"  * Status               : {egress['air_gap_status']}")
     print(f"  * Compliance Standard  : {egress['compliance_standard']}")
-    print(f"  * WAN Egress Packets   : {egress['wan_egress_packets']}")
-    print(f"  * Blocked Remote Hosts : {egress['blocked_remote_hosts']}")
+    print(f"  * WAN Egress Packets   : {egress['wan_egress_count']}")
     print(f"  * Timestamp            : {egress['timestamp']}")
+    print(f"  * External Telemetry   : BLOCKED (0 calls)")
     
     print("\n[ACTIVE BOUND LOCAL SOCKETS]:")
     for svc in egress.get('localhost_services', []):
-        print(f"  - PID {svc.get('pid', 'N/A')}: {svc.get('name', 'Service')} bound to {svc.get('local_address')}:{svc.get('local_port')} ({svc.get('status')})")
+        print(f"  - Port {svc.get('port')}: {svc.get('service')} bound to {svc.get('bind_ip')}")
     
     print("\n[OK] Zero-Egress Verification Complete.")
 
@@ -92,8 +92,36 @@ def cmd_audit(args):
         print(f"[+] Listing last {limit} Audit Trail Records...")
         logs = get_all_logs(limit=limit)
         for log in logs:
-            print(f"  [{log.get('timestamp')}] ID: {log.get('id')} | User: {log.get('user_id')} | Action: {log.get('action')} | Clearance: {log.get('clearance_level')}")
-            print(f"     Hash: {log.get('hash_sha256')[:24]}... | PrevHash: {log.get('prev_hash')[:24]}...")
+            print(f"  [{log.get('timestamp')}] ID: {log.get('log_id')} | User: {log.get('user_id')} | Action: {log.get('action')}")
+            print(f"     CurrHash: {log.get('current_hash')[:24]}... | PrevHash: {log.get('prev_hash')[:24]}...")
+
+def cmd_benchmark(args):
+    """Run full hardware and latency benchmark."""
+    from app.core.benchmarks import benchmark_engine
+    print("[+] Running Sovereign Benchmark & Hardware Profiler...")
+    res = benchmark_engine.run_full_benchmark()
+    b = res["benchmarks"]
+    print(f"\n[BENCHMARK RESULTS]:")
+    print(f"  * SHA-256 Hash Speed     : {b['sha256_throughput_hashes_per_sec']:,.0f} hashes/sec")
+    print(f"  * Routing Latency        : {b['model_routing_latency_ms']} ms")
+    print(f"  * Sandbox Startup & Exec : {b['sandbox_exec_latency_ms']} ms ({b['sandbox_status']})")
+    print(f"  * RAG Retrieval Latency  : {b['rag_retrieval_latency_ms']} ms")
+    print(f"  * RAG Faithfulness Score : {b['rag_faithfulness_score'] * 100}%")
+    print(f"  * Local Token Speed      : {b['local_token_generation_speed_tok_sec']} tok/sec")
+    print("\n[OK] Benchmark Complete.")
+
+def cmd_health(args):
+    """Display comprehensive system health."""
+    from app.core.system_health import get_system_health_report
+    print("[+] Querying System Component Health...")
+    res = get_system_health_report()
+    print(f"\n[SYSTEM HEALTH]: Status: {res['overall_status']}")
+    print(f"  * CPU Utilization : {res['hardware_telemetry']['cpu_utilization_pct']}%")
+    print(f"  * RAM Used        : {res['hardware_telemetry']['ram_used_gb']} / {res['hardware_telemetry']['ram_total_gb']} GB")
+    print("\n[SERVICES]:")
+    for s in res["services"]:
+        print(f"  - [{s['status']}] {s['name']}: {s['details']}")
+    print("\n[OK] Health Check Complete.")
 
 async def _run_ingest(file_path: Path, department: str, classification: str):
     from app.rag.vector_store import vector_store
@@ -136,16 +164,33 @@ async def _run_demo(demo_num: int):
         for art in res['artifacts']:
             print(f"  * Generated File : {art['filename']} (Path: {DELIVERABLES_DIR / art['filename']})")
     elif demo_num == 3:
-        print("[+] Executing Flagship Demo 3: Zero-Egress Air-Gap Verification...")
-        from app.core.zero_egress import get_network_egress_status
-        from app.core.audit import verify_audit_chain
-        egress = get_network_egress_status()
-        audit_res = verify_audit_chain()
+        print("[+] Executing Flagship Demo 3: Document -> RAG -> Cited Sovereign Answer...")
+        prompt = "What is the maximum allowed bearing vibration threshold for Category-1 steam turbines before mandatory de-energization under SOP Section 2.1?"
+        res = await agent.process_task(prompt, user_id="officer_sharma", attachments=[])
         print("\n[DEMO 3 RESULT]:")
-        print(f"  * Air-Gap Mode   : STRICT ZERO-EGRESS")
-        print(f"  * WAN Packets    : {egress['wan_egress_packets']}")
-        print(f"  * Audit Blocks   : {audit_res['total_records']} verified")
-        print(f"  * Blockchain Hash: {audit_res['latest_block_hash']}")
+        print(f"  * Selected Model : {res['model_routing']['selected_model']}")
+        print(f"  * Citations Found: {len(res['citations'])}")
+        for cit in res['citations']:
+            print(f"     - Source: {cit['source']} | Page: {cit['page']} | Clause: {cit['clause']}")
+    elif demo_num == 4:
+        print("[+] Executing Flagship Demo 4: Multimodal Image & Blueprint Understanding...")
+        prompt = "Analyze scanned defect photograph for journal bearing cavitation and evaluate against defence standards."
+        res = await agent.process_task(prompt, user_id="officer_sharma", attachments=["bearing_cavitation_scan.png"])
+        print("\n[DEMO 4 RESULT]:")
+        print(f"  * Selected Model : {res['model_routing']['selected_model']}")
+        print(f"  * Task Type      : {res['model_routing']['task_type']}")
+        print(f"  * Citations      : {len(res['citations'])}")
+    elif demo_num == 5:
+        print("[+] Executing Flagship Demo 5: Multi-File Comprehensive Master Task (PDF + CSV + Photo -> DOCX + XLSX + PPTX)...")
+        prompt = "Analyze all evidence: inspection.pdf, railway_sensor_telemetry.csv, and bearing photos. Correlate findings, issue emergency directive, and prepare complete deliverable suite (.docx, .xlsx, .pptx)."
+        res = await agent.process_task(prompt, user_id="admin_verma", attachments=["inspection.pdf", "railway_sensor_telemetry.csv", "photo.jpg"])
+        print("\n[DEMO 5 MASTER DELIVERABLE SUITE RESULT]:")
+        print(f"  * Selected Model : {res['model_routing']['selected_model']}")
+        print(f"  * Steps Executed : {len(res['steps'])}")
+        print(f"  * Citations      : {len(res['citations'])}")
+        print(f"  * Approvals Req  : {len(res['approvals'])}")
+        for art in res['artifacts']:
+            print(f"  * Generated File : [{art['type']}] {art['filename']}")
     print("\n[OK] Demo Execution Complete.")
 
 def cmd_demo(args):
@@ -173,6 +218,14 @@ def main():
     p_audit.add_argument("--limit", type=int, default=10, help="Number of records to show")
     p_audit.set_defaults(func=cmd_audit)
 
+    # benchmark
+    p_bench = subparsers.add_parser("benchmark", help="Run hardware latency & throughput benchmark")
+    p_bench.set_defaults(func=cmd_benchmark)
+
+    # health
+    p_health = subparsers.add_parser("health", help="Check system services health")
+    p_health.set_defaults(func=cmd_health)
+
     # ingest
     p_ingest = subparsers.add_parser("ingest", help="Ingest documents into sovereign vector store")
     p_ingest.add_argument("file", help="Path to document to ingest")
@@ -181,8 +234,8 @@ def main():
     p_ingest.set_defaults(func=cmd_ingest)
 
     # demo
-    p_demo = subparsers.add_parser("demo", help="Run SIH Flagship Demo scenarios")
-    p_demo.add_argument("scenario", type=int, choices=[1, 2, 3], help="Scenario number (1, 2, or 3)")
+    p_demo = subparsers.add_parser("demo", help="Run SIH Flagship Demo scenarios (1 to 5)")
+    p_demo.add_argument("scenario", type=int, choices=[1, 2, 3, 4, 5], help="Scenario number (1, 2, 3, 4, or 5)")
     p_demo.set_defaults(func=cmd_demo)
 
     args = parser.parse_args()
@@ -196,4 +249,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

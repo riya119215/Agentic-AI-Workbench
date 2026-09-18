@@ -32,13 +32,28 @@ Thumbs.db
 *.swp
 *.swo
 
-# Local Sandbox Scratch & Temp Databases
+# Local Sandbox, Temp Runs & Runtime Data
 backend/data/sandbox_workspace/*
 !backend/data/sandbox_workspace/.gitkeep
+
 backend/data/deliverables/*
 !backend/data/deliverables/.gitkeep
+
+backend/data/workspaces/*
+!backend/data/workspaces/.gitkeep
+
+backend/data/chroma_db/*
+!backend/data/chroma_db/.gitkeep
+
+backend/data/audit_logs/*
+!backend/data/audit_logs/.gitkeep
+
+backend/data/knowledge_base/*
+!backend/data/knowledge_base/.gitkeep
+
 dist_airgap/
 
 # Environment Variables
 .env
 .env.local
+.env.*.local

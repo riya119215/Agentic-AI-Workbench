@@ -1,4 +1,4 @@
-﻿import openpyxl
+import openpyxl
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from pathlib import Path
 from datetime import datetime
@@ -91,3 +91,55 @@ def create_analytics_spreadsheet(
     filepath = DELIVERABLES_DIR / filename
     wb.save(str(filepath))
     return filename
+
+def modify_and_highlight_excel(
+    source_filepath: Path,
+    anomaly_column: str,
+    threshold_value: float,
+    condition: str = "GREATER_THAN",
+    output_prefix: str = "Audited_Highlighted"
+) -> str:
+    """
+    Reads an existing workbook, identifies numerical anomalies based on threshold,
+    highlights offending cells in red, and saves as a newly audited copy.
+    """
+    wb = openpyxl.load_workbook(str(source_filepath))
+    ws = wb.active
+
+    # Red warning fill
+    red_fill = PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid")
+    red_font = Font(name="Calibri", size=10, bold=True, color="991B1B")
+
+    # Find target column index
+    target_col_idx = None
+    for col in range(1, ws.max_column + 1):
+        cell_val = str(ws.cell(row=1, column=col).value or "").strip()
+        if anomaly_column.lower() in cell_val.lower():
+            target_col_idx = col
+            break
+
+    anomalies_flagged = 0
+    if target_col_idx:
+        for row in range(2, ws.max_row + 1):
+            cell = ws.cell(row=row, column=target_col_idx)
+            try:
+                val = float(cell.value)
+                is_anomaly = False
+                if condition == "GREATER_THAN" and val > threshold_value:
+                    is_anomaly = True
+                elif condition == "LESS_THAN" and val < threshold_value:
+                    is_anomaly = True
+                
+                if is_anomaly:
+                    cell.fill = red_fill
+                    cell.font = red_font
+                    anomalies_flagged += 1
+            except (ValueError, TypeError):
+                pass
+
+    timestamp_str = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"{output_prefix}_{source_filepath.stem}_{timestamp_str}.xlsx"
+    filepath = DELIVERABLES_DIR / filename
+    wb.save(str(filepath))
+    return filename
+

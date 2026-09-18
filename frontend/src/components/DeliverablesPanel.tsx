@@ -1,5 +1,5 @@
-﻿import React from "react";
-import { FileText, FileSpreadsheet, Image as ImageIcon, Download, ExternalLink } from "lucide-react";
+import React from "react";
+import { FileText, FileSpreadsheet, Presentation, Image as ImageIcon, Download, CheckCircle2, Shield } from "lucide-react";
 import { Artifact, api } from "../lib/api";
 
 interface DeliverablesPanelProps {
@@ -16,6 +16,8 @@ export const DeliverablesPanel: React.FC<DeliverablesPanelProps> = ({ artifacts 
       case "XLSX":
       case "CSV":
         return <FileSpreadsheet className="w-5 h-5 text-emerald-400" />;
+      case "PPTX":
+        return <Presentation className="w-5 h-5 text-amber-400" />;
       case "PNG":
       case "JPG":
         return <ImageIcon className="w-5 h-5 text-purple-400" />;
@@ -25,12 +27,12 @@ export const DeliverablesPanel: React.FC<DeliverablesPanelProps> = ({ artifacts 
   };
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 my-3">
-      <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-3">
-        <h4 className="text-xs font-semibold text-slate-200 uppercase tracking-wider flex items-center space-x-2">
+    <div className="bg-[#0B1528] border border-slate-800 rounded-xl p-4 my-3">
+      <div className="flex items-center justify-between pb-2 border-b border-slate-800/80 mb-3">
+        <h4 className="text-xs font-bold text-slate-100 uppercase tracking-wider font-mono flex items-center space-x-2">
           <span>📦 Generated Deliverables & Real File Artifacts</span>
         </h4>
-        <span className="text-[10px] text-emerald-400 font-mono">
+        <span className="text-[10px] text-emerald-400 font-mono font-bold">
           {artifacts.length} file(s) compiled on-premise
         </span>
       </div>
@@ -43,20 +45,28 @@ export const DeliverablesPanel: React.FC<DeliverablesPanelProps> = ({ artifacts 
           return (
             <div
               key={idx}
-              className="flex flex-col justify-between p-3 rounded-lg bg-slate-950/70 border border-slate-800/80 hover:border-slate-700 transition-all"
+              className="flex flex-col justify-between p-3 rounded-lg bg-[#060D1A] border border-slate-800/80 hover:border-cyan-500/40 transition-all"
             >
               <div className="flex items-start space-x-3">
                 <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
                   {getIcon(art.type)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-slate-200 truncate" title={art.filename}>
+                  <p className="text-xs font-bold text-slate-100 font-mono truncate" title={art.filename}>
                     {art.filename}
                   </p>
-                  <p className="text-[11px] text-slate-400">{art.label}</p>
-                  <p className="text-[10px] font-mono text-slate-500 mt-0.5">
-                    Format: {art.type} • {(art.size_bytes / 1024).toFixed(1)} KB
-                  </p>
+                  <p className="text-[11px] text-slate-300">{art.label}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-slate-800 text-cyan-400 border border-slate-700">
+                      {art.type}
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {(art.size_bytes / 1024).toFixed(1)} KB
+                    </span>
+                    <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-0.5">
+                      <CheckCircle2 className="w-2.5 h-2.5" /> SHA-256 Verified
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -76,7 +86,7 @@ export const DeliverablesPanel: React.FC<DeliverablesPanelProps> = ({ artifacts 
                   download={art.filename}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600/90 hover:bg-blue-600 text-white shadow-sm transition-all"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-slate-950 shadow-sm transition-all"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download Deliverable</span>

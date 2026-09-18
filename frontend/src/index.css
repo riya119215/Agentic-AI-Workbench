@@ -1,34 +1,44 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light;
+  }
   body {
-    @apply bg-[#060D1A] text-slate-100 antialiased;
+    @apply bg-[#F7F6F2] text-[#171717] font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight text-[#171717];
   }
 }
 
-/* Custom subtle scrollbar */
+/* Minimalist Clean Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B1728;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1E3A63;
+  background: #DCDAD3;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2D5894;
+  background: #BEBCB4;
 }
 
+/* Subtle dot animation */
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.4; }
 }
 
 .animate-pulse-subtle {
   animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
