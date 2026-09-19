@@ -119,3 +119,16 @@ class VerificationEngine:
 
 
 verification_engine = VerificationEngine()
+
+def verify_parameter(
+    parameter_name: str,
+    measured_value: Union[int, float],
+    threshold_value: Union[int, float],
+    operator: str = "<=",
+    unit: str = "",
+    rule_severity: Optional[str] = None
+) -> Dict[str, Any]:
+    return verification_engine.verify_numeric_rule(
+        parameter_name, measured_value, threshold_value, operator, unit, rule_severity
+    )
+

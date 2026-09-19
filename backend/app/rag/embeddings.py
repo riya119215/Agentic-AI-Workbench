@@ -31,7 +31,7 @@ class EmbeddingGateway:
             raise EmbeddingError("Empty text cannot be embedded.")
 
         try:
-            async with httpx.AsyncClient(timeout=4.0) as client:
+            async with httpx.AsyncClient(timeout=httpx.Timeout(4.0, connect=1.0)) as client:
                 res = await client.post(
                     f"{self.base_url}/api/embeddings",
                     json={"model": self.model, "prompt": text}

@@ -245,3 +245,6 @@ def create_executive_presentation(
     prs.save(str(filepath))
 
     return filename
+
+create_executive_deck = create_executive_presentation
+

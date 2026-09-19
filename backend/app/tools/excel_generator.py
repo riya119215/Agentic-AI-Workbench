@@ -143,3 +143,6 @@ def modify_and_highlight_excel(
     wb.save(str(filepath))
     return filename
 
+create_telemetry_excel = create_analytics_spreadsheet
+
+

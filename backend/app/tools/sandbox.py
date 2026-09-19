@@ -48,11 +48,37 @@ def execute_python_sandbox(
 import sys
 import socket
 
-# Defense-in-depth socket blocking
-def _blocked_socket(*args, **kwargs):
-    raise PermissionError("NETWORK_BLOCKED: Sandbox does not permit external socket connections.")
+# Layer 1: Python socket class override
+_orig_socket = socket.socket
+class _BlockedSocket(_orig_socket):
+    def connect(self, *args, **kwargs):
+        raise PermissionError("NETWORK_BLOCKED: Sandbox does not permit external socket connections.")
+    def connect_ex(self, *args, **kwargs):
+        raise PermissionError("NETWORK_BLOCKED: Sandbox does not permit external socket connections.")
+    def bind(self, *args, **kwargs):
+        raise PermissionError("NETWORK_BLOCKED: Sandbox does not permit binding sockets.")
 
-socket.socket = _blocked_socket
+socket.socket = _BlockedSocket
+socket.create_connection = lambda *args, **kwargs: (_ for _ in ()).throw(PermissionError("NETWORK_BLOCKED: Outbound connection blocked."))
+
+# Layer 2: Subprocess network binary interception
+try:
+    import subprocess
+    _orig_popen = subprocess.Popen
+    _BLOCKED_BINS = {"curl", "wget", "nc", "netcat", "socat", "ssh", "telnet", "ftp", "powershell", "pwsh"}
+    class _BlockedPopen(_orig_popen):
+        def __init__(self, args, *a, **kw):
+            cmd_name = ""
+            if isinstance(args, (list, tuple)) and args:
+                cmd_name = str(args[0]).lower().replace(".exe", "").split("/")[-1].split("\\\\")[-1]
+            elif isinstance(args, str):
+                cmd_name = args.lower().split()[0].replace(".exe", "").split("/")[-1].split("\\\\")[-1]
+            if cmd_name in _BLOCKED_BINS or any(b in cmd_name for b in _BLOCKED_BINS):
+                raise PermissionError(f"AIR_GAP_ENFORCED: Invocation of network utility '{cmd_name}' is blocked by sandbox policy.")
+            super().__init__(args, *a, **kw)
+    subprocess.Popen = _BlockedPopen
+except Exception:
+    pass
 
 # Safe non-interactive Matplotlib
 try:

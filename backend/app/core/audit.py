@@ -1,4 +1,4 @@
-﻿import sqlite3
+import sqlite3
 import hashlib
 import json
 from datetime import datetime, timezone
@@ -74,6 +74,8 @@ def log_audit_event(user_id: str, role: str, action: str, details: dict or str, 
         "prev_hash": prev_hash,
         "current_hash": current_hash
     }
+
+record_audit_event = log_audit_event
 
 def get_all_logs(limit: int = 100) -> list:
     init_audit_db()

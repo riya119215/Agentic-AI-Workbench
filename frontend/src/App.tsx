@@ -1,30 +1,43 @@
 import React, { useState, useEffect } from "react";
-import { TopBar, PrimaryRoute } from "./components/TopBar";
-import { WorkspaceHub } from "./components/WorkspaceHub";
-import { WorkspaceView } from "./components/WorkspaceView";
-import { CommandPalette } from "./components/CommandPalette";
-import { AgentStudio } from "./components/AgentStudio";
-import { KnowledgeHub } from "./components/KnowledgeHub";
-import { ModelControlCenter } from "./components/ModelControlCenter";
-import { VisionWorkspace } from "./components/VisionWorkspace";
-import { WorkflowBuilder } from "./components/WorkflowBuilder";
-import { DeliverablesWorkspace } from "./components/DeliverablesWorkspace";
-import { SecurityCenter } from "./components/SecurityCenter";
-import { SystemMonitor } from "./components/SystemMonitor";
-import { api, UserProfile } from "./lib/api";
+import { TopNav } from "./components/layout/TopNav";
+import { LandingView } from "./components/views/LandingView";
+import { TaskWorkspaceView } from "./components/views/TaskWorkspaceView";
+import { KnowledgeBaseView } from "./components/views/KnowledgeBaseView";
+import { DeliverablesView } from "./components/views/DeliverablesView";
+import { DocumentPreviewModal } from "./components/modals/DocumentPreviewModal";
+import { SourceInspectionDrawer } from "./components/modals/SourceInspectionDrawer";
+import { VerificationInspectionDrawer, VerificationFinding } from "./components/modals/VerificationInspectionDrawer";
+import { NetworkDetailsModal } from "./components/modals/NetworkDetailsModal";
+import { api, UserProfile, Artifact, Citation } from "./lib/api";
+import { PrimaryView } from "./lib/types";
+import { TaskSession } from "./lib/taskStorage";
 
 export function App() {
+  const [activeView, setActiveView] = useState<PrimaryView>("workspace");
+  const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [activeRoute, setActiveRoute] = useState<PrimaryRoute>("workspace");
-  const [selectedWorkspace, setSelectedWorkspace] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [scenarioPrompt, setScenarioPrompt] = useState<string>("");
-  const [scenarioAttachments, setScenarioAttachments] = useState<string[]>([]);
 
+  // Active Task Inputs
+  const [taskPrompt, setTaskPrompt] = useState<string>("");
+  const [taskAttachments, setTaskAttachments] = useState<string[]>([]);
+  const [sandboxCode, setSandboxCode] = useState<string | undefined>(undefined);
+
+  // Modals & Drawers State
+  const [previewArtifact, setPreviewArtifact] = useState<Artifact | null>(null);
+  const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
+  const [isVerificationOpen, setIsVerificationOpen] = useState(false);
+  const [verificationFindings, setVerificationFindings] = useState<VerificationFinding[] | undefined>(undefined);
+  const [isNetworkModalOpen, setIsNetworkModalOpen] = useState(false);
+
+  // Guarantee light mode class on root
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
+    localStorage.removeItem("sov_theme");
+  }, []);
+
+  // Load user clearance profile on mount
   useEffect(() => {
     const init = async () => {
       try {
@@ -34,218 +47,161 @@ export function App() {
           setCurrentUser(uList[0]);
         }
       } catch (err) {
-        console.error("Initialization error:", err);
+        setCurrentUser({
+          user_id: "officer_sharma",
+          name: "Col. Sharma",
+          role: "Officer",
+          department: "Turbomachinery QA",
+          clearance_level: "SECRET",
+          allowed_tools: ["all"]
+        });
       }
     };
     init();
   }, []);
 
-  const handleOpenWorkspace = (workspaceId: string, name: string) => {
-    setSelectedWorkspace({ id: workspaceId, name });
-    setActiveRoute("workspace");
+  // Handle prompt submission from landing screen
+  const handleSubmitTask = (prompt: string, attachments: string[] = [], mode: string = "Balanced") => {
+    const newId = `task_${Date.now()}`;
+    setTaskPrompt(prompt);
+    setTaskAttachments(attachments);
+    setActiveTaskId(newId);
+    setActiveView("workspace");
   };
 
-  const handleExecuteScenario = (
-    scenarioId: string,
-    prompt: string,
-    attachments: string[]
-  ) => {
-    const scenarioNames: Record<string, string> = {
-      "demo-1": "Turbine Unit 7 Overhaul",
-      "demo-2": "Railway Axle Telemetry Analysis",
-      "demo-3": "Executive Defect & Telemetry Package"
-    };
-    setSelectedWorkspace({
-      id: scenarioId,
-      name: scenarioNames[scenarioId] || "Operational Scenario"
-    });
-    setScenarioPrompt(prompt);
-    setScenarioAttachments(attachments);
-    setActiveRoute("workspace");
+  const handleSelectSavedSession = (session: TaskSession) => {
+    setActiveTaskId(session.id);
+    setTaskPrompt(session.prompt || "");
+    setTaskAttachments(session.attachments || []);
+    setActiveView("workspace");
+  };
+
+  const handleNewTask = () => {
+    const newId = `task_${Date.now()}`;
+    setActiveTaskId(newId);
+    setTaskPrompt("");
+    setTaskAttachments([]);
+    setActiveView("workspace");
+  };
+
+  // Handle Quick Action card clicks
+  const handleQuickAction = (actionType: "document" | "code" | "drawing" | "note") => {
+    if (actionType === "document") {
+      handleSubmitTask(
+        "Analyze this scanned inspection report for Unit 7 Turbine against SOP-TURB-IND-2026-V4.",
+        ["INSPECTION_REPORT_TURBINE_UNIT_7.txt"]
+      );
+    } else if (actionType === "code") {
+      handleSubmitTask(
+        "Verify vibration and temperature limits for Unit 7 against approved SOP limits.",
+        ["INSPECTION_REPORT_TURBINE_UNIT_7.txt"]
+      );
+    } else if (actionType === "drawing") {
+      handleSubmitTask(
+        "Summarize this inspection report and maintenance procedure into an executive brief.",
+        ["INSPECTION_REPORT_TURBINE_UNIT_7.txt"]
+      );
+    } else if (actionType === "note") {
+      handleSubmitTask(
+        "Generate official Government Approval Note Sheet (.docx) for emergency overhaul of Unit 7 Turbine.",
+        ["INSPECTION_REPORT_TURBINE_UNIT_7.txt"]
+      );
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F6F2] text-[#171717] font-sans selection:bg-emerald-100 selection:text-emerald-900">
-      {/* Top Navigation Bar */}
-      <TopBar
-        activeRoute={activeRoute}
-        onSelectRoute={(route) => {
-          setActiveRoute(route);
-          if (route === "workspace" && !selectedWorkspace) {
-            setSelectedWorkspace(null);
+    <div className="h-full max-h-screen flex flex-col bg-[#F7F6F2] text-[#171717] font-sans antialiased selection:bg-[#E8F7F1] selection:text-[#00A878] overflow-hidden">
+      {/* Clean 48px Top Header Navigation */}
+      <TopNav
+        activeView={activeView}
+        onSelectView={(view) => {
+          setActiveView(view);
+          if (view === "workspace" && !activeTaskId) {
+            setActiveTaskId(null);
           }
         }}
         currentUser={currentUser}
         users={users}
         onSelectUser={setCurrentUser}
-        onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+        onOpenNetworkModal={() => setIsNetworkModalOpen(true)}
       />
 
-      {/* Global Command Palette (Ctrl+K / ⌘K) */}
-      <CommandPalette
-        isOpen={commandPaletteOpen}
-        onClose={() => setCommandPaletteOpen(false)}
-        onSelectRoute={(route) => setActiveRoute(route)}
-        onOpenWorkspace={handleOpenWorkspace}
-        onExecuteScenario={handleExecuteScenario}
-      />
-
-      {/* Main Operational Container */}
-      <main className="flex-1 overflow-hidden flex flex-col">
-        {/* WORKSPACE ROUTE */}
-        {activeRoute === "workspace" && (
+      {/* Main View Router */}
+      <main className="flex-1 flex flex-col overflow-hidden relative min-h-0">
+        {/* WORKSPACE VIEW: Landing vs Active Clean Workspace */}
+        {activeView === "workspace" && (
           <>
-            {selectedWorkspace ? (
-              <WorkspaceView
-                workspaceId={selectedWorkspace.id}
-                workspaceName={selectedWorkspace.name}
+            {activeTaskId ? (
+              <TaskWorkspaceView
+                key={activeTaskId}
+                taskId={activeTaskId}
                 currentUser={currentUser}
-                initialPrompt={scenarioPrompt}
-                initialAttachments={scenarioAttachments}
-                onBackToHub={() => {
-                  setSelectedWorkspace(null);
-                  setScenarioPrompt("");
-                  setScenarioAttachments([]);
+                onBackToHome={() => {
+                  setActiveTaskId(null);
+                  setTaskPrompt("");
+                  setTaskAttachments([]);
                 }}
+                onNewTask={handleNewTask}
+                onOpenSandbox={() => {}}
+                onOpenCitation={(cit) => setSelectedCitation(cit)}
+                onPreviewDeliverable={(art) => setPreviewArtifact(art)}
+                onOpenVerification={(findings) => {
+                  setVerificationFindings(findings);
+                  setIsVerificationOpen(true);
+                }}
+                initialPrompt={taskPrompt}
+                initialAttachments={taskAttachments}
               />
             ) : (
-              <div className="flex-1 overflow-y-auto">
-                <WorkspaceHub
-                  currentUser={currentUser}
-                  onOpenWorkspace={handleOpenWorkspace}
-                  onExecuteScenario={handleExecuteScenario}
-                  onSelectRoute={setActiveRoute}
-                />
-              </div>
+              <LandingView
+                onSubmitPrompt={handleSubmitTask}
+                onQuickAction={handleQuickAction}
+                onSelectSavedSession={handleSelectSavedSession}
+              />
             )}
           </>
         )}
 
-        {/* AGENTS ROUTE */}
-        {activeRoute === "agents" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <AgentStudio
-              currentUser={currentUser}
-              initialPrompt={scenarioPrompt}
-              initialAttachments={scenarioAttachments}
-              onClearInitialDemo={() => {
-                setScenarioPrompt("");
-                setScenarioAttachments([]);
-              }}
-            />
-          </div>
+        {/* KNOWLEDGE BASE VIEW */}
+        {activeView === "knowledge" && (
+          <KnowledgeBaseView
+            onOpenCitation={(cit) => setSelectedCitation(cit)}
+          />
         )}
 
-        {/* KNOWLEDGE ROUTE */}
-        {activeRoute === "knowledge" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <KnowledgeHub
-              currentUser={currentUser}
-              onSelectQuery={(prompt, attachments) =>
-                handleExecuteScenario("demo-1", prompt, attachments)
-              }
-            />
-          </div>
-        )}
-
-        {/* MODELS ROUTE */}
-        {activeRoute === "models" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <ModelControlCenter />
-          </div>
-        )}
-
-        {/* VISION ROUTE */}
-        {activeRoute === "vision" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <VisionWorkspace
-              onNavigateToAgent={(prompt, attachments) =>
-                handleExecuteScenario("demo-1", prompt, attachments)
-              }
-            />
-          </div>
-        )}
-
-        {/* WORKFLOWS ROUTE */}
-        {activeRoute === "workflows" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <WorkflowBuilder
-              onNavigateToAgent={(prompt, attachments) =>
-                handleExecuteScenario("demo-1", prompt, attachments)
-              }
-            />
-          </div>
-        )}
-
-        {/* DELIVERABLES ROUTE */}
-        {activeRoute === "deliverables" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <DeliverablesWorkspace />
-          </div>
-        )}
-
-        {/* SECURITY ROUTE */}
-        {activeRoute === "security" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <SecurityCenter />
-          </div>
-        )}
-
-        {/* SYSTEM TELEMETRY ROUTE */}
-        {activeRoute === "system" && (
-          <div className="p-4 flex-1 overflow-auto">
-            <button
-              onClick={() => setActiveRoute("workspace")}
-              className="mb-4 text-xs font-semibold text-[#171717] hover:underline flex items-center gap-1"
-            >
-              ← Back to Workspace
-            </button>
-            <SystemMonitor />
-          </div>
+        {/* DELIVERABLES VIEW */}
+        {activeView === "deliverables" && (
+          <DeliverablesView
+            onPreviewDeliverable={(art) => setPreviewArtifact(art)}
+          />
         )}
       </main>
+
+      {/* Slide-Over Drawers & Modal Overlays */}
+      <SourceInspectionDrawer
+        citation={selectedCitation}
+        onClose={() => setSelectedCitation(null)}
+      />
+
+      <VerificationInspectionDrawer
+        isOpen={isVerificationOpen}
+        onClose={() => setIsVerificationOpen(false)}
+        findings={verificationFindings}
+        onGenerateReport={() => {
+          handleSubmitTask("Generate official Government Approval Note Sheet (.docx) for emergency overhaul.");
+          setIsVerificationOpen(false);
+        }}
+      />
+
+      <DocumentPreviewModal
+        artifact={previewArtifact}
+        onClose={() => setPreviewArtifact(null)}
+      />
+
+      <NetworkDetailsModal
+        isOpen={isNetworkModalOpen}
+        onClose={() => setIsNetworkModalOpen(false)}
+      />
     </div>
   );
 }

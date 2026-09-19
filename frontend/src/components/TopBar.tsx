@@ -64,14 +64,24 @@ export const TopBar: React.FC<TopBarProps> = ({
     return () => clearInterval(interval);
   }, []);
 
-  const primaryNavItems: { id: PrimaryRoute; label: string }[] = [
-    { id: "workspace", label: "Workspace" },
-    { id: "agents", label: "Agents" },
-    { id: "knowledge", label: "Knowledge" },
-    { id: "models", label: "Models" },
-    { id: "vision", label: "Vision" },
-    { id: "workflows", label: "Workflows" },
-  ];
+  const isAdmin = currentUser?.role?.toLowerCase() === "admin";
+
+  const primaryNavItems: { id: PrimaryRoute; label: string }[] = isAdmin
+    ? [
+        { id: "workspace", label: "Workspace" },
+        { id: "knowledge", label: "Knowledge" },
+        { id: "models", label: "Models" },
+        { id: "vision", label: "Vision" },
+        { id: "workflows", label: "Workflows" },
+        { id: "security", label: "Security & Audit" },
+        { id: "system", label: "System" },
+      ]
+    : [
+        { id: "workspace", label: "Workspace" },
+        { id: "knowledge", label: "Knowledge" },
+        { id: "deliverables", label: "Deliverables" },
+        { id: "security", label: "Audit & Security" },
+      ];
 
   const isZeroEgress = egressStatus ? egressStatus.is_air_gapped && egressStatus.wan_egress_count === 0 : true;
 
@@ -103,7 +113,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           </div>
 
 
-          {/* Center 6 Primary Navigation Destinations */}
+          {/* Center Role-Based Primary Navigation */}
           <nav className="hidden md:flex items-center gap-1">
             {primaryNavItems.map((item) => {
               const isActive = activeRoute === item.id;
@@ -151,7 +161,7 @@ export const TopBar: React.FC<TopBarProps> = ({
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${isZeroEgress ? "bg-[#00A878] animate-pulse-subtle" : "bg-[#F59E0B]"}`} />
                 <span className="text-[11px] font-medium">
-                  {isZeroEgress ? "Local • Air-gap" : "Network Active"}
+                  {isZeroEgress ? "0 WAN Sockets • Air-Gapped ✓" : "WAN Egress Detected"}
                 </span>
               </button>
 

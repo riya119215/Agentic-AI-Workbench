@@ -17,6 +17,7 @@ class DocumentParser:
     """
 
     def parse_document(self, file_path: Path, document_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        file_path = Path(file_path)
         if not file_path.exists():
             raise DocumentParserError(f"File not found: {file_path}")
 
@@ -208,6 +209,24 @@ class DocumentParser:
         }]
 
     def _parse_image(self, file_path: Path, doc_id: str, sha256: str) -> List[Dict[str, Any]]:
+        from app.tools.ocr_tool import ocr_engine
+        ocr_res = ocr_engine.extract_document_ocr(file_path, doc_id)
+        pages = ocr_res.get("pages", [])
+        if pages:
+            return [{
+                "document_id": doc_id,
+                "filename": file_path.name,
+                "page_number": p.get("page_number", 1),
+                "section": f"Visual Evidence ({file_path.suffix.upper().replace('.', '')})",
+                "text": p.get("text", ""),
+                "metadata": {
+                    "sha256": sha256,
+                    "format": file_path.suffix.upper().replace(".", ""),
+                    "confidence": p.get("confidence", 0.92),
+                    "engine": p.get("engine", "Local-OCR")
+                }
+            } for p in pages]
+
         return [{
             "document_id": doc_id,
             "filename": file_path.name,
@@ -221,3 +240,13 @@ class DocumentParser:
         }]
 
 document_parser = DocumentParser()
+
+def parse_document(file_path: Path, document_id: Optional[str] = None) -> Dict[str, Any]:
+    file_path = Path(file_path)
+    chunks = document_parser.parse_document(file_path, document_id)
+    text_content = "\n".join([c.get("text", "") for c in chunks])
+    return {
+        "text_content": text_content,
+        "chunks": chunks
+    }
+

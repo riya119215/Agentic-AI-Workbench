@@ -115,9 +115,12 @@ class WorkspaceManager:
 
         ws_dir = self.get_workspace_dir(workspace_id)
         if not ws_dir.exists():
-            raise WorkspaceError(f"Workspace {workspace_id} does not exist.")
+            ws_dir.mkdir(parents=True, exist_ok=True)
+            for sub in SAFE_SUBFOLDERS:
+                (ws_dir / sub).mkdir(parents=True, exist_ok=True)
 
         target_subfolder = (ws_dir / subfolder).resolve()
+        target_subfolder.mkdir(parents=True, exist_ok=True)
         
         # Check filename for traversal attempts
         if ".." in filename or filename.startswith("/") or filename.startswith("\\") or ":" in filename:

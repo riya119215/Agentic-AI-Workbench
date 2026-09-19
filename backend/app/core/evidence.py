@@ -18,6 +18,12 @@ ALLOWED_EXTENSIONS = {
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".jpeg": "image/jpeg",
+    ".webp": "image/webp",
+    ".bmp": "image/bmp",
+    ".py": "text/x-python",
+    ".json": "application/json",
+    ".log": "text/plain",
+    ".md": "text/markdown",
 }
 
 # Magic bytes signature checking for strict content validation
@@ -29,6 +35,8 @@ MAGIC_SIGNATURES = {
     ".docx": [b"PK\x03\x04"],
     ".xlsx": [b"PK\x03\x04"],
     ".pptx": [b"PK\x03\x04"],
+    ".bmp": [b"BM"],
+    ".webp": [b"RIFF"],
 }
 
 class EvidenceError(Exception):

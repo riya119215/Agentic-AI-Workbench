@@ -414,10 +414,10 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
                 {workspaceName}
               </h1>
               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#F0EFEA] text-[#686762] border border-[#DCDAD3]">
-                {workspaceId}
+                {workspaceId.startsWith("ws-") ? `Case #${workspaceId.replace("ws-", "").toUpperCase()}` : workspaceId}
               </span>
               <span className="text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-[#E6F7F2] text-[#006B4D] border border-[#00A878]/30">
-                SANDBOX ISOLATED
+                Zero-Egress Execution
               </span>
             </div>
             <p className="text-[11px] text-[#686762] mt-0.5">
@@ -475,7 +475,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
         >
           <span className="w-2 h-2 rounded-full bg-[#00A878]" />
           <span className="font-semibold text-[#171717]">2. Knowledge</span>
-          <span className="text-[10px] text-[#686762]">(BGE-M3 / Chroma)</span>
+          <span className="text-[10px] text-[#686762]">({indexedDocs.length || 4} standards)</span>
         </div>
 
         <ChevronRight className="w-3.5 h-3.5 text-[#9E9D98] shrink-0" />
@@ -1148,12 +1148,12 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Context Inspector (3 cols) */}
+        {/* RIGHT COLUMN: Sources & Citations (3 cols) */}
         <div className="lg:col-span-3 bg-white border border-[#DCDAD3] rounded-lg p-3.5 flex flex-col justify-between overflow-y-auto">
           <div className="space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-[#DCDAD3]">
               <span className="text-xs font-semibold text-[#171717] uppercase tracking-wider">
-                Context Inspector
+                Sources & Citations
               </span>
               <span className="text-[10px] font-mono text-[#9E9D98]">
                 {inspectedItem ? inspectedItem.type.toUpperCase() : "LIVE RUN"}

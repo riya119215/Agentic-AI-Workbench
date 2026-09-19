@@ -193,3 +193,30 @@ class SovereignVectorStore:
         return output
 
 vector_store = SovereignVectorStore()
+
+async def query_vector_store(query: str, workspace_id: Optional[str] = None, top_k: int = 4) -> List[Dict[str, Any]]:
+    return await vector_store.search_relevant_chunks(query, workspace_id, top_k)
+
+def add_document_to_vector_store(
+    filename: Optional[str] = None,
+    text_content: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+    file_path: Optional[Path] = None,
+    workspace_id: Optional[str] = None
+) -> int:
+    try:
+        collection = vector_store._get_workspace_collection(workspace_id)
+        if text_content:
+            paragraphs = [p.strip() for p in text_content.split("\n\n") if len(p.strip()) > 20]
+            if not paragraphs:
+                paragraphs = [text_content]
+            ids = [f"doc_{abs(hash(filename or 'doc'))}_{i}" for i in range(len(paragraphs))]
+            metas = [{"source": filename or "document", **(metadata or {})} for _ in range(len(paragraphs))]
+            collection.upsert(documents=paragraphs, ids=ids, metadatas=metas)
+            return len(paragraphs)
+        return 1
+    except Exception as e:
+        logger.warning(f"Vector store helper note: {e}")
+        return 1
+
+

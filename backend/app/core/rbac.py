@@ -1,4 +1,4 @@
-﻿from enum import Enum
+from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel
 
@@ -55,3 +55,11 @@ def get_user_by_id(user_id: str) -> Optional[UserProfile]:
         if u.user_id == user_id:
             return u
     return DEFAULT_USERS[0] # Default fallback
+
+def check_user_permission(user_id: str, tool_name: str) -> bool:
+    user = get_user_by_id(user_id)
+    if not user:
+        return True
+    perms = ROLE_PERMISSIONS.get(user.role, {}).get("tools", [])
+    return "all" in perms or tool_name in perms or tool_name == "all"
+

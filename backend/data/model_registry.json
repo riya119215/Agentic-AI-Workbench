@@ -1,0 +1,59 @@
+[
+  {
+    "id": "llama3.2:latest",
+    "name": "Meta Llama 3.2 (3B Instruct)",
+    "task_type": "Reasoning & Report Drafting",
+    "category": "reasoning",
+    "endpoint": "http://127.0.0.1:11434",
+    "size_gb": 2.0,
+    "vram_pct": 24,
+    "acceleration": "CPU AVX2 / Vulkan",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "qwen2.5-coder:7b",
+    "name": "Qwen 2.5 Coder (7B)",
+    "task_type": "Code Generation & Sandbox",
+    "category": "code",
+    "endpoint": "http://127.0.0.1:11434",
+    "size_gb": 4.7,
+    "vram_pct": 48,
+    "acceleration": "CPU AVX2 / Vulkan",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "bge-m3:latest",
+    "name": "BAAI BGE-M3 Dense Embedding",
+    "task_type": "Multi-Lingual RAG Embeddings",
+    "category": "embedding",
+    "endpoint": "http://127.0.0.1:11434",
+    "size_gb": 1.1,
+    "vram_pct": 15,
+    "acceleration": "Local Engine",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "llava-phi3:vision",
+    "name": "LLaVA Phi-3 Mini Vision",
+    "task_type": "Vision Metrology & Drawings",
+    "category": "vision",
+    "endpoint": "http://127.0.0.1:11434",
+    "size_gb": 2.9,
+    "vram_pct": 32,
+    "acceleration": "Local Engine",
+    "status": "ACTIVE"
+  },
+  {
+    "id": "qwen2.5-coder:14b-enterprise",
+    "name": "Qwen 2.5 Coder 14B Enterprise",
+    "task_type": "Code Generation & Sandbox",
+    "category": "code",
+    "endpoint": "http://127.0.0.1:11434",
+    "size_gb": 8.9,
+    "vram_pct": 62,
+    "acceleration": "Local Engine",
+    "status": "ACTIVE",
+    "is_preferred": true,
+    "registered_at": "2026-09-19T07:15:10.523881+00:00"
+  }
+]

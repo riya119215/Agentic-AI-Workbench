@@ -12,8 +12,8 @@ CHROMA_DIR = DATA_DIR / "chroma_db"
 AUDIT_DIR = DATA_DIR / "audit_logs"
 SAMPLE_DATASETS_DIR = DATA_DIR / "sample_datasets"
 SANDBOX_DIR = DATA_DIR / "sandbox_workspace"
-
 WORKSPACES_DIR = DATA_DIR / "workspaces"
+MODEL_REGISTRY_FILE = DATA_DIR / "model_registry.json"
 
 for d in [KNOWLEDGE_BASE_DIR, DELIVERABLES_DIR, CHROMA_DIR, AUDIT_DIR, SAMPLE_DATASETS_DIR, SANDBOX_DIR, WORKSPACES_DIR]:
     d.mkdir(parents=True, exist_ok=True)
@@ -23,10 +23,9 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
 
 # Model Palette (Configured for local Ollama)
 REASONING_MODEL = os.getenv("REASONING_MODEL", "llama3.2:latest")
-CODING_MODEL = os.getenv("CODING_MODEL", "llama3.2:latest")
-VISION_MODEL = os.getenv("VISION_MODEL", "llama3.2:latest")
+CODING_MODEL = os.getenv("CODING_MODEL", "qwen2.5-coder:7b")
+VISION_MODEL = os.getenv("VISION_MODEL", "llava-phi3:vision")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "bge-m3:latest")
 
 # Fallback Mode: if specific model is temporarily unavailable, provide fallback
-ALLOW_SIMULATED_FALLBACK = True
-
+ALLOW_SIMULATED_FALLBACK = False
