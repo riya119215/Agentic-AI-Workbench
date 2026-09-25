@@ -4,55 +4,74 @@
 
 @layer base {
   :root {
-    /* Sovereign Enterprise Light Theme */
-    --bg-canvas: #F7F6F2;
+    /* Sovereign Government Portal Theme */
+    --bg-canvas: #F4F6F9;
     --bg-surface: #FFFFFF;
-    --bg-surface-secondary: #F0EFEA;
-    --border-subtle: #DCDAD3;
-    --border-strong: #BEBCB4;
-    --text-primary: #171717;
-    --text-secondary: #686762;
-    --text-muted: #8A8881;
-    --accent-primary: #00A878;
-    --accent-soft: #E8F7F1;
-    --status-error: #C83A3A;
-    --status-warning: #B7791F;
-    --status-success: #008F68;
+    --bg-surface-secondary: #EBF0F5;
+    --border-subtle: #CBD5E1;
+    --border-strong: #94A3B8;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --accent-primary: #0B192C;
+    --accent-gold: #D97706;
+    --accent-soft: #E0F2FE;
+    --status-error: #DC2626;
+    --status-warning: #D97706;
+    --status-success: #059669;
     color-scheme: light;
   }
 
   html {
     height: 100%;
-    background-color: #F7F6F2;
-    color: #171717;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F4F6F9;
+    color: #0F172A;
+    font-family: 'Public Sans', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
   body {
     height: 100%;
-    background-color: #F7F6F2;
-    color: #171717;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F4F6F9;
+    color: #0F172A;
+    font-family: 'Public Sans', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     overflow: hidden;
   }
 }
 
+/* Custom Government Seal & Badge Styling */
+.gov-seal-glow {
+  box-shadow: 0 0 15px rgba(217, 119, 6, 0.25);
+}
+
+.gov-banner-stripe {
+  background: linear-gradient(90deg, #07111E 0%, #0B192C 40%, #1E3E62 100%);
+}
+
+.gov-gold-border {
+  border-image: linear-gradient(to right, #B45309, #F59E0B, #B45309) 1;
+}
+
+.gov-card-pattern {
+  background-image: radial-gradient(rgba(11, 25, 44, 0.05) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
 /* Subtle clean minimal scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #DCDAD3;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #BEBCB4;
+  background: #94A3B8;
 }

@@ -10,7 +10,9 @@ import {
   Mic,
   MicOff,
   ArrowRight,
-  Check
+  Check,
+  ShieldCheck,
+  Lock
 } from "lucide-react";
 import { api } from "../../lib/api";
 
@@ -28,7 +30,7 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
   disabled = false,
   initialPrompt = "",
   initialAttachments = [],
-  placeholder = "Ask anything about your documents...",
+  placeholder = "Enter operational command directive or query document metrology...",
   autoFocus = false,
 }) => {
   const [prompt, setPrompt] = useState(initialPrompt);
@@ -47,7 +49,6 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
     if (initialAttachments.length > 0) setAttachments(initialAttachments);
   }, [initialPrompt, initialAttachments]);
 
-  // Clean up speech recognition on unmount
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
@@ -75,7 +76,7 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
       }
       setUploadStatus(`Attached ${fileList.length} document${fileList.length > 1 ? "s" : ""}`);
       setTimeout(() => setUploadStatus(null), 3000);
-    } catch (err: any) {
+    } catch {
       setUploadStatus(`Local attachment ready`);
       setTimeout(() => setUploadStatus(null), 3000);
     } finally {
@@ -177,17 +178,16 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
   const getFileIcon = (filename: string) => {
     const ext = filename.split(".").pop()?.toLowerCase();
     if (["png", "jpg", "jpeg", "webp", "bmp"].includes(ext || "")) {
-      return <ImageIcon className="w-3.5 h-3.5 text-[#00A878]" />;
+      return <ImageIcon className="w-3.5 h-3.5 text-[#D97706]" />;
     }
     if (["py", "json", "sql", "sh"].includes(ext || "")) {
-      return <FileCode className="w-3.5 h-3.5 text-[#686762]" />;
+      return <FileCode className="w-3.5 h-3.5 text-[#1E3E62]" />;
     }
-    return <FileText className="w-3.5 h-3.5 text-[#00A878]" />;
+    return <FileText className="w-3.5 h-3.5 text-[#0B192C]" />;
   };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
-    // Auto-adjust height
     e.target.style.height = "auto";
     e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`;
   };
@@ -200,10 +200,10 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
       }}
       onDragLeave={() => setIsDraggingOver(false)}
       onDrop={handleDrop}
-      className={`w-full bg-white border rounded-xl shadow-card transition-colors font-sans ${
+      className={`w-full bg-white border-2 rounded-xl shadow-card transition-all font-sans overflow-hidden ${
         isDraggingOver
-          ? "border-[#00A878] bg-[#E8F7F1]/30"
-          : "border-[#DCDAD3] focus-within:border-[#00A878]"
+          ? "border-[#D97706] bg-[#FEF3C7]/20"
+          : "border-[#CBD5E1] focus-within:border-[#1E3E62] focus-within:ring-2 focus-within:ring-[#1E3E62]/10"
       }`}
     >
       {/* Hidden File Input */}
@@ -216,25 +216,25 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
         className="hidden"
       />
 
-      {/* Top Bar: Add Files Button + Active Attachment Chips */}
-      <div className="px-3.5 pt-3 pb-1 flex flex-wrap items-center gap-2 border-b border-[#DCDAD3]/50">
+      {/* Top Bar: Government Attachment Controls */}
+      <div className="px-3.5 pt-2.5 pb-1 flex flex-wrap items-center gap-2 border-b border-[#E2E8F0] bg-[#F8FAFC]">
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading || disabled}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-[#686762] hover:text-[#171717] hover:bg-[#F0EFEA] transition cursor-pointer disabled:opacity-50"
-          title="Attach documents, reports, or images"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold text-[#1E3E62] hover:bg-[#E2E8F0] transition cursor-pointer disabled:opacity-50 border border-[#CBD5E1]"
+          title="Attach official documents, SOPs, or images"
         >
           {isUploading ? (
-            <RotateCw className="w-3.5 h-3.5 animate-spin text-[#00A878]" />
+            <RotateCw className="w-3.5 h-3.5 animate-spin text-[#D97706]" />
           ) : (
-            <Paperclip className="w-3.5 h-3.5" />
+            <Paperclip className="w-3.5 h-3.5 text-[#D97706]" />
           )}
-          <span>Add files</span>
+          <span>Attach Evidence Files</span>
         </button>
 
         {uploadStatus && (
-          <span className="text-[11px] text-[#008F68] font-medium inline-flex items-center gap-1">
+          <span className="text-[11px] text-[#059669] font-bold inline-flex items-center gap-1 bg-[#D1FAE5] px-2 py-0.5 rounded border border-[#059669]/30">
             <Check className="w-3 h-3" />
             {uploadStatus}
           </span>
@@ -243,14 +243,14 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
         {attachments.map((file) => (
           <span
             key={file}
-            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#F0EFEA] border border-[#DCDAD3] text-xs text-[#171717]"
+            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#EBF0F5] border border-[#CBD5E1] text-xs font-medium text-[#0B192C]"
           >
             {getFileIcon(file)}
             <span className="truncate max-w-[180px]">{file}</span>
             <button
               type="button"
               onClick={() => removeAttachment(file)}
-              className="text-[#8A8881] hover:text-[#C83A3A] cursor-pointer transition"
+              className="text-[#64748B] hover:text-[#DC2626] cursor-pointer transition"
             >
               <X className="w-3 h-3" />
             </button>
@@ -258,8 +258,8 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
         ))}
       </div>
 
-      {/* Middle: Textarea */}
-      <div className="px-3.5 py-2">
+      {/* Textarea */}
+      <div className="px-3.5 py-3">
         <textarea
           ref={textareaRef}
           autoFocus={autoFocus}
@@ -274,41 +274,46 @@ export const GlowingCommandBar: React.FC<GlowingCommandBarProps> = ({
           rows={2}
           placeholder={
             isListening
-              ? "Listening... speak into your microphone..."
+              ? "Listening to voice directive..."
               : placeholder
           }
           disabled={disabled}
-          className="w-full bg-transparent border-0 p-0 text-sm text-[#171717] placeholder-[#8A8881] focus:outline-none focus:ring-0 resize-none font-sans leading-relaxed"
+          className="w-full bg-transparent border-0 p-0 text-sm text-[#0F172A] placeholder-[#64748B] focus:outline-none focus:ring-0 resize-none font-sans leading-relaxed font-medium"
         />
       </div>
 
-      {/* Bottom Row: Voice Toggle & Send Button */}
-      <div className="px-3.5 pb-3 pt-1 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs text-[#8A8881]">
+      {/* Bottom Control Row */}
+      <div className="px-3.5 pb-2.5 pt-1 flex items-center justify-between border-t border-[#F1F5F9] bg-[#F8FAFC]">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={toggleVoiceInput}
-            className={`p-1.5 rounded-md transition cursor-pointer ${
+            className={`p-1.5 rounded-md transition cursor-pointer flex items-center gap-1 text-xs font-semibold ${
               isListening
-                ? "bg-[#C83A3A]/10 text-[#C83A3A]"
-                : "text-[#8A8881] hover:text-[#171717] hover:bg-[#F0EFEA]"
+                ? "bg-[#DC2626]/10 text-[#DC2626]"
+                : "text-[#64748B] hover:text-[#0B192C] hover:bg-[#E2E8F0]"
             }`}
-            title={isListening ? "Stop voice input" : "Dictate with microphone"}
+            title={isListening ? "Stop voice input" : "Dictate voice directive"}
           >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {isListening ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline text-[11px]">{isListening ? "Listening..." : "Dictate"}</span>
           </button>
-          {isListening && <span className="text-[11px] text-[#C83A3A]">Listening...</span>}
+
+          <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-[#64748B] font-medium border-l border-[#CBD5E1] pl-3">
+            <Lock className="w-3 h-3 text-[#059669]" />
+            <span>Encrypted Local Pipeline</span>
+          </div>
         </div>
 
         <button
           type="button"
           onClick={handleSubmit}
           disabled={(!prompt.trim() && attachments.length === 0) || disabled || isUploading}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#00A878] hover:bg-[#008F68] text-white text-xs font-medium transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs"
-          title="Send (Enter)"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-gradient-to-r from-[#0B192C] to-[#1E3E62] hover:from-[#07111E] hover:to-[#0B192C] text-white text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-card border border-[#D97706]/40"
+          title="Execute Command (Enter)"
         >
-          <span>Send</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <span>Execute Directive</span>
+          <ArrowRight className="w-3.5 h-3.5 text-[#F59E0B]" />
         </button>
       </div>
     </div>

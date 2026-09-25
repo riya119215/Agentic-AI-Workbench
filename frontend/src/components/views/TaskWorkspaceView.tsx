@@ -428,38 +428,43 @@ export const TaskWorkspaceView: React.FC<TaskWorkspaceViewProps> = ({
   ];
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#F7F6F2] select-none font-sans overflow-hidden min-h-0">
-      {/* Clean Top Control Bar */}
-      <div className="h-11 bg-white border-b border-[#DCDAD3] px-4 sm:px-6 flex items-center justify-between shrink-0">
+    <div className="flex-1 flex flex-col h-full bg-[#F4F6F9] select-none font-sans overflow-hidden min-h-0">
+      {/* Official Top Control Bar */}
+      <div className="h-11 bg-white border-b border-[#CBD5E1] px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-2xs">
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={onBackToHome}
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-[#F0EFEA] text-xs font-medium text-[#686762] hover:text-[#171717] transition cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md hover:bg-[#F1F5F9] text-xs font-bold text-[#1E3E62] transition cursor-pointer border border-[#CBD5E1]"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Tasks</span>
+            <ArrowLeft className="w-3.5 h-3.5 text-[#D97706]" />
+            <span>Return to Directives</span>
           </button>
 
           {onNewTask && (
             <button
               onClick={onNewTask}
-              className="flex items-center gap-1 px-2 py-1 rounded-md bg-white border border-[#DCDAD3] hover:bg-[#F0EFEA] text-xs font-medium text-[#171717] transition cursor-pointer"
-              title="Start a new chat analysis"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#0B192C] text-white hover:bg-[#07111E] text-xs font-bold transition cursor-pointer border border-[#D97706]/40"
+              title="Start a new command directive"
             >
-              <Plus className="w-3.5 h-3.5 text-[#00A878]" />
-              <span>New</span>
+              <Plus className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span>New Task</span>
             </button>
           )}
 
-          <div className="h-3.5 w-[1px] bg-[#DCDAD3]" />
+          <div className="h-4 w-[1px] bg-[#CBD5E1]" />
 
-          <h2 className="text-xs font-semibold text-[#171717] truncate max-w-sm sm:max-w-md">
-            {initialAttachments && initialAttachments.length > 0
-              ? initialAttachments[0]
-              : initialPrompt
-              ? initialPrompt.slice(0, 45) + "..."
-              : "Operational Analysis"}
-          </h2>
+          <div className="flex items-center gap-2 truncate max-w-sm sm:max-w-md">
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-[#FEF3C7] text-[#D97706] font-bold border border-[#D97706]/30">
+              DIRECTIVE
+            </span>
+            <h2 className="text-xs font-bold text-[#0B192C] truncate">
+              {initialAttachments && initialAttachments.length > 0
+                ? initialAttachments[0]
+                : initialPrompt
+                ? initialPrompt.slice(0, 45) + "..."
+                : "Operational Analysis"}
+            </h2>
+          </div>
         </div>
 
         {/* View Toggles */}
@@ -468,15 +473,15 @@ export const TaskWorkspaceView: React.FC<TaskWorkspaceViewProps> = ({
           {deliverables.length > 0 && (
             <button
               onClick={() => setShowRightPanel(!showRightPanel)}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium transition cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-bold transition cursor-pointer ${
                 showRightPanel
-                  ? "bg-[#F0EFEA] border-[#BEBCB4] text-[#171717]"
-                  : "bg-white border-[#DCDAD3] text-[#686762] hover:text-[#171717] hover:bg-[#F0EFEA]"
+                  ? "bg-[#0F172A] border-[#0F172A] text-white shadow-sm"
+                  : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9]"
               }`}
             >
-              <Layers className="w-3.5 h-3.5 text-[#00A878]" />
+              <Layers className="w-3.5 h-3.5 text-[#10B981]" />
               <span>Deliverables</span>
-              <span className="text-[10px] font-mono px-1 rounded bg-[#E8F7F1] text-[#008F68] font-bold">
+              <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-[#10B981]/20 text-[#10B981] font-bold">
                 {deliverables.length}
               </span>
             </button>
@@ -485,14 +490,14 @@ export const TaskWorkspaceView: React.FC<TaskWorkspaceViewProps> = ({
           {/* Execution flow toggle */}
           <button
             onClick={() => setShowCenterPanel(!showCenterPanel)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium transition cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-bold transition cursor-pointer ${
               showCenterPanel
-                ? "bg-[#F0EFEA] border-[#BEBCB4] text-[#171717]"
-                : "bg-white border-[#DCDAD3] text-[#686762] hover:text-[#171717] hover:bg-[#F0EFEA]"
+                ? "bg-[#0F172A] border-[#0F172A] text-white shadow-sm"
+                : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F1F5F9]"
             }`}
             title="Inspect Agent Execution Flow"
           >
-            <GitBranch className="w-3.5 h-3.5 text-[#686762]" />
+            <GitBranch className="w-3.5 h-3.5 text-[#059669]" />
             <span className="hidden sm:inline">Execution Flow</span>
           </button>
         </div>
